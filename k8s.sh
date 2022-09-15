@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "install helm cli"
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
