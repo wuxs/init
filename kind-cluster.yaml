@@ -24,6 +24,10 @@ nodes:
 - role: control-plane
   image: kindest/node:v1.22.15
   extraPortMappings:
+  - containerPort: 6443
+    hostPort: 6443
+    listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
+    protocol: tcp # Optional, defaults to tcp
   - containerPort: 30880
     hostPort: 30880
     listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
