@@ -2,7 +2,7 @@
 
 curl https://get.docker.com |bash
 
-apt install socat conntrack ebtables ipset
+apt install socat conntrack ebtables ipset -y -qqq 2>/dev/null
 
 export KKZONE=cn
 
