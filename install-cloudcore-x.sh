@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ $# !=1 ];then
+if [ $# !=2 ];then
   echo 'use "bash install-cloudcore-x.sh x" to install cloudcore with ports 300x0-300x4. (x is a number between 0 and 9)'
   exit 1
 fi
