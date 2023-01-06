@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-echo "bash update-edgecore.sh <0-9> $TOKEN"
-
 
 [ ! -f /etc/kubeedge/config/edgecore.yaml.bak ] && cp /etc/kubeedge/config/edgecore.yaml /etc/kubeedge/config/edgecore.yaml.bak
+
 
 service edgecore stop
 
@@ -12,8 +11,8 @@ cp /tmp/edgecore.yaml  /etc/kubeedge/config/edgecore.yaml
 sed -re "s/token.+/token: $2/g"  /etc/kubeedge/config/edgecore.yaml > /tmp/edgecore.yaml
 cp /tmp/edgecore.yaml  /etc/kubeedge/config/edgecore.yaml
 
-rm /etc/kubeedge/ca/*
-rm /etc/kubeedge/certs/*
-rm /var/lib/kubeedge/edgecore.db
+rm  /var/lib/kubeedge/edgecore.db
+rm  /etc/kubeedge/ca/*
+rm  /etc/kubeedge/certs/*
 
 service edgecore start
