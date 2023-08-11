@@ -25,7 +25,8 @@ CONFIG='{
 
 IP=$(curl -s https://api.ipify.org)
 
-PASSWORD=$(openssl rand -base64 12 | tr -d '+/=' | cut -c1-16)
+# PASSWORD=$(openssl rand -base64 12 | tr -d '+/=' | cut -c1-16)
+PASSWORD="3VTGuLV8emEZtMgL"
 
 FILE="/usr/local/etc/xray/config.json"
 
