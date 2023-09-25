@@ -8,4 +8,4 @@ curl -sfL https://get-kk.kubesphere.io | sh -
 
 chmod +x kk
 
-echo "./kk create cluster --with-kubernetes v1.22.10 --with-kubesphere v3.3.0"
+echo "./kk create cluster --with-kubernetes v1.22 --with-kubesphere v3.3.0"
