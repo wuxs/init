@@ -4,7 +4,7 @@ apt install socat conntrack ebtables ipset -y -qqq 2>/dev/null
 
 export KKZONE=cn
 
-curl -sfL https://get-kk.kubesphere.io | VERSION=v2.2.1 sh -
+curl -sfL https://get-kk.kubesphere.io | sh -
 
 chmod +x kk
 
