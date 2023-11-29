@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: edgewize-installer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: edgewize-installer-role
+rules:
+  - apiGroups: [ "*" ]
+    resources: [ "*" ]
+    verbs: [ "*" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: edgewize-installer-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: edgewize-installer
+roleRef:
+  kind: Role
+  name: edgewize-installer-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: edgewize-installer-job
+spec:
+  template:
+    metadata:
+      name: edgewize-installer
+      labels:
+        app: edgewize-installer
+    spec:
+      restartPolicy: Never
+      serviceAccountName: edgewize-installer
+      containers:
+        - name: installer
+          image: edgewize/installer:latest
+          imagePullPolicy: "Always"
+          env:
+            - name: ADVERTISE_ADDRESS
+              value: "" # need to change
+            - name: IMAGE_REGISTRY
+              value: harbor.dev.thingsdao.com
+#            - name: STORAGE_CLASS
+#              value: local # "nfs" should be set in ABC environment
+            - name: EDGEWIZE_VERSION
+              value: "v0.7.4" # default is latest version
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: host-time
+              readOnly: true
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+  backoffLimit: 0

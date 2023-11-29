@@ -1,0 +1,769 @@
+---
+# Source: vcluster/charts/etcd/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kse-etcd
+  namespace: "kse"
+  labels:
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.8.3
+    app.kubernetes.io/instance: kse
+    app.kubernetes.io/managed-by: Helm
+spec:
+  minAvailable: 51%
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: etcd
+      app.kubernetes.io/instance: kse
+---
+# Source: vcluster/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vc-kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+imagePullSecrets:
+  - name: zpk-deploy-secret
+---
+# Source: vcluster/templates/workloadserviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vc-workload-kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+imagePullSecrets:
+  - name: zpk-deploy-secret
+---
+# Source: vcluster/charts/etcd/templates/token-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kse-etcd-jwt-token
+  namespace: "kse"
+  labels:
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.8.3
+    app.kubernetes.io/instance: kse
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+  jwt-token.pem: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS2dJQkFBS0NBZ0VBd0lwdFlVMS9xaG5tZXdaWmZPRVFlVDNmRFJWRE9BZWVIcjZnbEpWTEFhWXJBQ3hvCjJpUjlIUG0xSjhCNS8za0t0bjZhcWpnOERxU3BhdHh1T00xQlNqMmJYUGkxODdTd29nVEZpQXBkR21xSGtub2YKbjc3TnFJY1Zla3ZJY1dPODkxU3ZNTkdsTktqNDdMMk9DYUdCSk1DNGxicy9OYW1qdHpDeGNYYk80VU5oaW5USgovcXdxOHJKVlBKUjRJbk9uRGZvZTZ5UnR1QVdCb1VrSTJCSUVTV2p3eERvQUtld0U4NlVock1EaFh6cktRbkl3CjNidVNOK2dGRGNvKzhJMWlTejQ3WFRuWDJoUkhEZ3FkeWswTlJCRVFxMXJqL0lXUUFWV3lGK2tKblQ1cjMrUzEKeFN5MndNd0VraVA0Ky85YmRiT2ZNVVBaRUJRMnZLaFZYbGJyeU9YSU5uRG9YVnhXM1daYW1pVE1ZTU15UDVUNgorZGl0eDZmTHc4TzR3ZHZTZmhGWTR6Z1diNzBlU3pVNzByeEJxRFVFZG9PY2lXb2FGQkRLVERoRUhjVkI4Q3VrClVHOXFKRWEwUTNTSm5FTXRlNU5zajJxY1pRaXA3akkzeXJsMWVnWjF0UzdCb0hTWm1OWUMyeDFiYWN2UWQ3NWkKNS91eVhwS2VBSVY5Y2gyVDRsWW1WYmx1TGIvRGxMVkhxVTBKcGNWRkRyWkxnMzVvMjFiLzFwZVlwRzNuV3N0aApMdVpTZy9BbkFtVzc5OXA1anFmMTJaNUxPUjlQY2h4TUlJMDBYaDlSaU4zMFFEVmJpbUU5VzVzMkhrMGVMcXU2CkczMHYyTUJDZng2NG03YkVxclQwZ09MdFJDazhIOGtOR2lXS2tvVXo1cE01YWhYcXBhOW5MUExLeHprQ0F3RUEKQVFLQ0FnRUF0TDkrclRDR24xWFBJMEN6czJMSkJ6aEk4MHc1blJpeG5HVVI5RW91YnE3aWdUZ3ZlbEYwemtXdwpoVS9RZHo3WENyalJVdWlWb0oxOW1aNnpMa21wZUJ0YmhTektDcTFlZjhxQThSUGhrUkhla1docDFabldFTlkzCkdHYWFGYkF1emZUR3ZjcWhEMDFzMlRtZFpIY2orQytmV0ppK1h3OFFiTUdlWWtqSkwza0UwV2lQMDY4bVprMTUKYlBSbnp0ZkpSSHJBbWJmSjlFM2ZBbHpBbTY1V0xlQUEzZ1VnOERucjhCbmVBZ0hUMElVdEtMRndKRWVZblRrSAp2WWxXQ3BaL1p1bFY2MCtJemVYcFNrbzNGSm0rMFY0L3lzejVaNjZ1b0VJbGZRSzhqc3Z4a3U1dW9WbzNlY2hNCnBqQjA1WVEwQk11SnIwTGxPNDN1VUs2cDdYVWx4QUl2TXE3U1lzcFR3NDIwSDNXaUNBU1pRWk1OeFM4dDcwYWgKbDlKUVZUNDVQRzV1Y1U5clpkdjdua2NBL1E0YTNaOVZZaWtQWk1mMVh4Vm9MRDBRK3lkSGhza2NJRGgvWHhlVwpTMEh4eW90WFdBaHRQeklBVFg1TlZJOStXSFcrb3RFK0JUeDh2Z3NKY3A1MHcxMWxYcWx3VThoTUxwdGV0Wk1SCkRMWlpSanRSZFlLSVB3NnAvSVVhaE9RRGxhR1N1UDZvTXgydUdJTTJRb1NiS1VBcUkrdXpaaG8xRXJXVlU3amMKdlhNRFQ4cWQ2Vmd0SUxTSkQ5Rm93Wk5LM2hneUlEVUlwS0VRQmkvdnMzTHZndGo5Um95Q3cxMkY5dTFRR3k0cwprZXl6eUltcWFhMnZtZk1LVDUxSm5pZy8zSnVLWkNsODRodGh2ZGx0dlliV0M0c1JyZkVDZ2dFQkFORDFFcXB0CmlEc1FhV2hpYWxrcUdzeHRLWXdwMTdpT2d6K3dBOXBzOFNxcHlLZjJvU3NCbmNQU2tsWG5ialgxaG5LSG1GS1kKbzc4eEZTalhleWNveklRQ1gybmdDUjAwY1RreXdZQUtjVW11Q0pvNURJL3E3VmI4SFk5dFUvK2NjTm9pZWRwVgpsRWdpS1hBZ2JvUGE3a0NWOVFNMjdsc3M5Wk1lRDVvM0NBOFVBMElhbzVSbEwzTkdpa1ByOGU5Smk1bDZQSWxECjMxNE9jSWpQVG51MmZrMSsvRkh3c1BaS3lPa3lUVG9RNVVGTjltU05HRVJzYWMveUNxVXNodXdkQ1h2T0FydXoKZVppUC9uQXZoR1BQZm1JUEdnSWRiUEFCZEFTaGpsRmlvOGJkNk1LWTBWVVlUNFlZbDhWckovaDhIWlN1QTErbgpVdHNXenVOd2xTZkZ5MjBDZ2dFQkFPdmpOZE5xalU2dndkWEFDb0ZTNmxCMXhweDhvVHFlZ3BVend0dVRtRmRBCjQ5RW9HclJ2aFlKRVlIZm40R1BrNmdOcnZUQTQ2ZWJ2enFPTFJEQ0JTbzMwVUF1NzNBTjBrZ09rZ2NBTDYrakUKU2JOejNoRkl1VUhUbm1BWUI2OFdRVVRKNExpTXBKb2UyekxXM3FjNDBpSEJJYzRvcFl2eGhjMCtoYVZJUEFJUApLNUlpZThTOFlqSmdzaDVFdnA5VzZKeUcwNGhzRTFJYWhYVWRpNkM0RDBJVit5MUVQM1lBMDMwNlB1eEsyRm93Cm9Db3UxNk9Xb1g2MDg5OE1RUGxJbUlFMDRiREZNUlhoeWp6MjFMME9xNkRXU0cvdk5jdjZ4ZzhCTERkdVk0Q2YKYlhLczRLb0h1ZGozRVpWRDAvRy94THlGc0lDT0IxSkg1aXh1T0s3OVgzMENnZ0VCQUxnUXljcDdCZUFSaXVpNgptTGZHa1NpMm1EeXh0eWNKMHEvTld2ZVRzN1ZETGxCV3ZvM2x0SldFN2diaUFJRmpzSFUrNEgwUm5GeVUzZkRHCkwrUEUyck1HYkFvVm9iR3FPbnFLTFUyZTVVQmtINHZLNlRmMVYvQ2gwV0JBakJmRU5OelNOY2lRVGpoa2IyQW8KRVhIdzdxTFI5YXhKUFJudnRydExaYThRL3ZaWlNLMTRUZFF3ZGVYem8yUkZlUzZ4K0ZqUUJuZGI1RzAwQndsYwpvK1B5VTd2c09sUHIwOWFBOWc0RmsyV3M4R1hnU1VVMXpNU3BRMlE3OEFpaitvNE8zZ1hDNlVGeXpaQUlkN2RYCkJDWHY1NEoxanhHQjNpNWsrVkFEQ0J6RTZVUUt3amg0NlIwdWR3N0dweHJ1VTUxZHA2a0t5RW9BV01wSmd5RnkKVU5GaU9Oa0NnZ0VCQUkvU0tvRktsL2wvNDdrRnErSUp3ZDlvejcyZHAxZnNTVVhiRjFWMWVnN0krNTRNeTZ0egp5MzBQWDVuOEFLNG5aaDdMMDcvUkU1dkFYc2NNSkhsR2UwUnR6MWc0SS83ZlZoOXViOFc5L3dvZWs2a2NYaXMvCm9lUm11RXR5bTB5L1R2QTMvaEhIZnB5UmI2aGhwY05qTzR0bEM4MThydUxTVVhoQVJJL3ZxTmJBbFJvMmVDd04KaC9tYlJ6NTVQNWc3RHZ4UW9DeXZhR0JJMTFIK3Y2RXdWKzA5SmJZRnhJT1lJVnBhNXY1KzY4YWhteVhkQlpFeQpTQ2pPLzFuaFNNUTA1UGJ5WFNEQU9odFRYVkVxVmE4bmdMRkJ0VXk2RnB6VnUyaHVtSno3YXlPREVPSTRVWXFaCngxQm40NHFVbm1icE8zU09ObjFMRzErcGdzZFlOS3RNeEtrQ2dnRUFKVnRtOW9ENlVQQ09aQmdMd1J3VlhLRzcKMzhUNVJLUllDazRnZE9FWDVBYlhPcnlvL3dpRnN5YVg0cjNaSEFhOW9DU0k2MjdDMU5rOExFSXNEY2xWeG9WNgpXVVlsVjZoa29VNzNKUDNacGRGa1puZzBCQ2t5cU0rUE1lQ1Fkbk1KbDcrbmhlUDc4NnFUNitYTDM5V0ZWeFZHCmw4aEo2UEhpb0lBZmlMU3lBSFdxbzd3dGl4VGdjMTN5b0lhcnVYUWt4Z1BKZmVad1pGV0QvcTlHRnRJNTdnWG8KY2llTG9GRWtDeEY4RnAyS2hKangyUWlTbkF6bHRkMGJleCtOTFd3dmZPTWRIWFNrWWM3UzMyWlZQa2UrWkM4egpZekh1MHVvVXVyY0VLQk92ZzR1cmFrT0VPU0U5MlRaNEpHOEorcXlWQWpLMnRNUVNGdmp0VXRQZjFsRXhFdz09Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg=="
+---
+# Source: vcluster/templates/coredns.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kse-coredns
+  namespace: kse
+data:
+  coredns.yaml: |-
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: coredns
+      namespace: kube-system
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        kubernetes.io/bootstrapping: rbac-defaults
+      name: system:coredns
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - endpoints
+          - services
+          - pods
+          - namespaces
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - discovery.k8s.io
+        resources:
+          - endpointslices
+        verbs:
+          - list
+          - watch
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      annotations:
+        rbac.authorization.kubernetes.io/autoupdate: "true"
+      labels:
+        kubernetes.io/bootstrapping: rbac-defaults
+      name: system:coredns
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: system:coredns
+    subjects:
+      - kind: ServiceAccount
+        name: coredns
+        namespace: kube-system
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: coredns
+      namespace: kube-system
+    data:
+      Corefile: |
+        .:1053 {
+            {{.LOG_IN_DEBUG}}
+            errors
+            health
+            ready
+            kubernetes cluster.local in-addr.arpa ip6.arpa {
+              pods insecure
+              fallthrough in-addr.arpa ip6.arpa
+            }
+            hosts /etc/coredns/NodeHosts {
+              ttl 60
+              reload 15s
+              fallthrough
+            }
+            prometheus :9153
+            forward . /etc/resolv.conf
+            cache 30
+            loop
+            reload
+            loadbalance
+        }
+
+        import /etc/coredns/custom/*.server
+      NodeHosts: ""
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: coredns
+      namespace: kube-system
+      labels:
+        k8s-app: kube-dns
+        kubernetes.io/name: "CoreDNS"
+    spec:
+      replicas: 1
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+      selector:
+        matchLabels:
+          k8s-app: kube-dns
+      template:
+        metadata:
+          labels:
+            k8s-app: kube-dns
+        spec:
+          priorityClassName: "system-cluster-critical"
+          serviceAccountName: coredns
+          nodeSelector:
+            kubernetes.io/os: linux
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  k8s-app: kube-dns
+          containers:
+            - name: coredns
+              image: {{.IMAGE}}
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 170Mi
+                requests:
+                  cpu: 3m
+                  memory: 16Mi
+              args: [ "-conf", "/etc/coredns/Corefile" ]
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /etc/coredns
+                  readOnly: true
+                - name: custom-config-volume
+                  mountPath: /etc/coredns/custom
+                  readOnly: true
+              ports:
+                - containerPort: 1053
+                  name: dns
+                  protocol: UDP
+                - containerPort: 1053
+                  name: dns-tcp
+                  protocol: TCP
+                - containerPort: 9153
+                  name: metrics
+                  protocol: TCP
+              securityContext:
+                runAsUser: {{.RUN_AS_USER}}
+                runAsNonRoot: {{.RUN_AS_NON_ROOT}}
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 1
+                successThreshold: 1
+                failureThreshold: 3
+              readinessProbe:
+                httpGet:
+                  path: /ready
+                  port: 8181
+                  scheme: HTTP
+                initialDelaySeconds: 0
+                periodSeconds: 2
+                timeoutSeconds: 1
+                successThreshold: 1
+                failureThreshold: 3
+          dnsPolicy: Default
+          volumes:
+            - name: config-volume
+              configMap:
+                name: coredns
+                items:
+                  - key: Corefile
+                    path: Corefile
+                  - key: NodeHosts
+                    path: NodeHosts
+            - name: custom-config-volume
+              configMap:
+                name: coredns-custom
+                optional: true
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: kube-dns
+      namespace: kube-system
+      annotations:
+        prometheus.io/port: "9153"
+        prometheus.io/scrape: "true"
+      labels:
+        k8s-app: kube-dns
+        kubernetes.io/cluster-service: "true"
+        kubernetes.io/name: "CoreDNS"
+    spec:
+      selector:
+        k8s-app: kube-dns
+      type: ClusterIP
+      ports:
+        - name: dns
+          port: 53
+          targetPort: 1053
+          protocol: UDP
+        - name: dns-tcp
+          port: 53
+          targetPort: 1053
+          protocol: TCP
+        - name: metrics
+          port: 9153
+          protocol: TCP
+---
+# Source: vcluster/templates/init-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kse-init-manifests
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+data:
+  manifests: |-
+    ---
+---
+# Source: vcluster/templates/rbac/clusterrole.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vc-kse-v-kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+rules:
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "watch", "list"]
+---
+# Source: vcluster/templates/rbac/clusterrolebinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vc-kse-v-kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+subjects:
+  - kind: ServiceAccount
+    name: vc-kse
+    namespace: kse
+roleRef:
+  kind: ClusterRole
+  name: vc-kse-v-kse
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vcluster/templates/rbac/role.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets", "services", "pods", "pods/attach", "pods/portforward", "pods/exec", "persistentvolumeclaims"]
+    verbs: ["create", "delete", "patch", "update", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["create", "delete", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["endpoints", "events", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets", "replicasets", "deployments"]
+    verbs: ["get", "list", "watch"]
+---
+# Source: vcluster/templates/rbac/rolebinding.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+subjects:
+  - kind: ServiceAccount
+    name: vc-kse
+    namespace: kse
+roleRef:
+  kind: Role
+  name: kse
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vcluster/charts/etcd/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kse-etcd-headless
+  namespace: "kse"
+  labels:
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.8.3
+    app.kubernetes.io/instance: kse
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: client
+      port: 2379
+      targetPort: client
+    - name: peer
+      port: 2380
+      targetPort: peer
+  selector:
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/instance: kse
+---
+# Source: vcluster/charts/etcd/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kse-etcd
+  namespace: "kse"
+  labels:
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.8.3
+    app.kubernetes.io/instance: kse
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: "client"
+      port: 2379
+      targetPort: client
+      nodePort: null
+    - name: "peer"
+      port: 2380
+      targetPort: peer
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: etcd
+    app.kubernetes.io/instance: kse
+---
+# Source: vcluster/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+spec:
+  type: ClusterIP
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443
+      protocol: TCP
+  selector:
+    app: vcluster
+    release: kse
+---
+# Source: vcluster/templates/statefulset-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kse-headless
+  namespace: kse
+  labels:
+    app: kse-vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+spec:
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443
+      protocol: TCP
+  clusterIP: None
+  selector:
+    app: vcluster
+    release: "kse"
+---
+# Source: vcluster/charts/etcd/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kse-etcd
+  namespace: "kse"
+  labels:
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.8.3
+    app.kubernetes.io/instance: kse
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: etcd
+      app.kubernetes.io/instance: kse
+  serviceName: kse-etcd-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: etcd
+        helm.sh/chart: etcd-8.8.3
+        app.kubernetes.io/instance: kse
+        app.kubernetes.io/managed-by: Helm
+      annotations:
+        checksum/token-secret: 0bc512beabff333e185cabf0aeda427e53df10f132f5ad5810ce0b297504e678
+    spec:
+      
+      imagePullSecrets:
+        - name: zpk-deploy-secret
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: etcd
+                    app.kubernetes.io/instance: kse
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: "default"
+      containers:
+        - name: etcd
+          image: harbor.dev.thingsdao.com/bitnami/etcd:3.5.8-debian-11-r0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_STS_NAME
+              value: "kse-etcd"
+            - name: ETCDCTL_API
+              value: "3"
+            - name: ETCD_ON_K8S
+              value: "yes"
+            - name: ETCD_START_FROM_SNAPSHOT
+              value: "no"
+            - name: ETCD_DISASTER_RECOVERY
+              value: "no"
+            - name: ETCD_NAME
+              value: "$(MY_POD_NAME)"
+            - name: ETCD_DATA_DIR
+              value: "/bitnami/etcd/data"
+            - name: ETCD_LOG_LEVEL
+              value: "info"
+            - name: ALLOW_NONE_AUTHENTICATION
+              value: "yes"
+            - name: ETCD_AUTH_TOKEN
+              value: "jwt,priv-key=/opt/bitnami/etcd/certs/token/jwt-token.pem,sign-method=RS256,ttl=10m"
+            - name: ETCD_ADVERTISE_CLIENT_URLS
+              value: "http://$(MY_POD_NAME).kse-etcd-headless.kse.svc.cluster.local:2379,http://kse-etcd.kse.svc.cluster.local:2379"
+            - name: ETCD_LISTEN_CLIENT_URLS
+              value: "http://0.0.0.0:2379"
+            - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
+              value: "http://$(MY_POD_NAME).kse-etcd-headless.kse.svc.cluster.local:2380"
+            - name: ETCD_LISTEN_PEER_URLS
+              value: "http://0.0.0.0:2380"
+            - name: ETCD_CLUSTER_DOMAIN
+              value: "kse-etcd-headless.kse.svc.cluster.local"
+          envFrom:
+          ports:
+            - name: client
+              containerPort: 2379
+              protocol: TCP
+            - name: peer
+              containerPort: 2380
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /opt/bitnami/scripts/etcd/healthcheck.sh
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - /opt/bitnami/scripts/etcd/healthcheck.sh
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: data
+              mountPath: /bitnami/etcd
+            - name: etcd-jwt-token
+              mountPath: /opt/bitnami/etcd/certs/token/
+              readOnly: true
+      volumes:
+        - name: etcd-jwt-token
+          secret:
+            secretName: kse-etcd-jwt-token
+            defaultMode: 256
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
+---
+# Source: vcluster/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kse
+  namespace: kse
+  labels:
+    app: vcluster
+    chart: "vcluster-0.13.0"
+    release: "kse"
+    heritage: "Helm"
+spec:
+  serviceName: kse-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vcluster
+      release: kse
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: 
+        resources:
+          requests:
+            storage: 5Gi
+  template:
+    metadata:
+      labels:
+        app: vcluster
+        release: kse
+    spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        {}
+      tolerations:
+        []
+      serviceAccountName: vc-kse
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: coredns
+          configMap:
+            name: kse-coredns
+      containers:
+      - image: harbor.dev.thingsdao.com/rancher/k3s:v1.23.5-k3s1
+        name: vcluster
+        # k3s has a problem running as pid 1 and disabled agents on cgroupv2
+        # nodes as it will try to evacuate the cgroups there. Starting k3s
+        # through a shell makes it non pid 1 and prevents this from happening
+        command:
+          - /bin/sh
+        args:
+          - -c
+          - /bin/k3s
+            server
+            --write-kubeconfig=/data/k3s-config/kube-config.yaml
+            --data-dir=/data
+            --disable=traefik,servicelb,metrics-server,local-storage,coredns
+            --disable-network-policy
+            --disable-agent
+            --disable-cloud-controller
+            --flannel-backend=none
+            --disable-scheduler
+            --kube-controller-manager-arg=controllers=*,-nodeipam,-nodelifecycle,-persistentvolume-binder,-attachdetach,-persistentvolume-expander,-cloud-node-lifecycle,-ttl
+            --kube-apiserver-arg=endpoint-reconciler-type=none
+            --service-cidr=$(SERVICE_CIDR)
+            --kube-scheduler-arg=leader-elect=false
+            --kube-controller-manager-arg=leader-elect=false
+            --datastore-endpoint=http://kse-etcd.kse.svc:2379
+            && true
+        env:
+          - name: SERVICE_CIDR
+            valueFrom:
+              configMapKeyRef:
+                name: "vc-cidr-kse"
+                key: cidr
+        securityContext:
+          allowPrivilegeEscalation: false
+        volumeMounts:
+          - name: config
+            mountPath: /etc/rancher
+          - mountPath: /data
+            name: data
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+      - name: syncer
+        image: "harbor.dev.thingsdao.com/loftsh/vcluster:0.13.0"
+        args:
+          - --name=kse
+          - --service-account=vc-workload-kse
+          - --default-image-registry=harbor.dev.thingsdao.com/
+          - --kube-config-context-name=my-vcluster
+          - --leader-elect=false          
+          - --sync=hoststorageclasses
+          - --sync=-ingressclasses                    
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          failureThreshold: 60
+          initialDelaySeconds: 60
+          periodSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8443
+            scheme: HTTPS
+          failureThreshold: 60
+          periodSeconds: 2
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: VCLUSTER_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+        volumeMounts:
+          - name: coredns
+            mountPath: /manifests/coredns
+            readOnly: true
+          - mountPath: /data
+            name: data
+            readOnly: true
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+          requests:
+            cpu: 20m
+            memory: 64Mi
