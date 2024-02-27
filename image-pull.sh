@@ -14,5 +14,5 @@ image_name=$(echo $image | cut -d':' -f1)
 image_tag=$(echo $image | cut -d':' -f2)
 
 # 拉取镜像并重新命名
-docker pull dockerproxy.com/$image_name:$image_tag
-docker tag dockerproxy.com/$image_name:$image_tag $image
+docker pull docker.wuxs.workers.dev/$image_name:$image_tag
+docker tag docker.wuxs.workers.dev/$image_name:$image_tag $image
