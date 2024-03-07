@@ -17,7 +17,7 @@ kubectl get pods --all-namespaces -o=jsonpath='{range .items[*]}{.metadata.names
     image_name=$(echo $image | cut -d':' -f1)
     image_tag=$(echo $image | cut -d':' -f2)
     echo "$runtime pull docker.wuxs.workers.dev/$image_name:$image_tag"
-    bash "$runtime pull docker.wuxs.workers.dev/$image_name:$image_tag"
-    bash "$runtime tag docker.wuxs.workers.dev/$image_name:$image_tag $image"
+    bash -c "$runtime pull docker.wuxs.workers.dev/$image_name:$image_tag"
     echo "$runtime tag docker.wuxs.workers.dev/$image_name:$image_tag $image"
+    bash -c "$runtime tag docker.wuxs.workers.dev/$image_name:$image_tag $image"
 done
