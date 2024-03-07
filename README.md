@@ -10,6 +10,6 @@
 | [ks-fix.sh](https://init.wuxs.vip/ks-fix.sh) | 禁止daemonset调度到边缘节点 |  |
 | [profile.ps1](https://init.wuxs.vip/profile.ps1) | windows 使用上下键匹配历史命令 |  |
 | [image-pull.sh](https://init.wuxs.vip/image-pull.sh) | 使用镜像源拉取镜像 | `bash image-pull.sh nginx:latest` |
-| [fix-image-pull.sh](https://init.wuxs.vip/fix-image-pull.sh) | 修复k8s拉取镜像 docker limit | `bash fix-image-pull.sh`  |
+| [fix-image-pull.sh](https://init.wuxs.vip/fix-image-pull.sh) | 修复k8s拉取镜像 docker limit | `bash fix-image-pull.sh`或`curl https://init.wuxs.vip/fix-image-pull.sh | bash ` |
 |  |  |  |
 
